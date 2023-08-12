@@ -55,25 +55,49 @@ namespace E_Commerce.Repository
 
             return ListItem;
         }
-
-        public async Task<string> AddItemAsync(CartItemModel model)
+        public async Task<CartItemModel> ShowItemCartAsync(string email, string idItem)
         {
-            var NewItem = _mapper.Map<CartItem>(model);
-            await _context.CartItems!.AddAsync(NewItem);
-            await _context.SaveChangesAsync();
-            return NewItem.Id;
+
+            var ListItem = _context.CartItems
+                .Where(CartItems => CartItems.Email == email && CartItems.Status == true)
+                .Join(_context.Books,
+                    CartItems => CartItems.IdBook,
+                    Books => Books.Id,
+                    (CartItems, Books) => new CartItemModel
+                    {
+                        Email = CartItems.Email,
+                        Id = CartItems.Id,
+                        IdBook = CartItems.IdBook,
+                        Name = Books.Namebook,
+                        Picture = Books.Picture,
+                        Number = CartItems.Number,
+                        Status = CartItems.Status,
+                        Price = Books.Price,
+
+                    })
+                .ToList();
+
+            return ListItem.FirstOrDefault();
         }
 
-        public async Task<BillModel> BuyAsync(string IdCart, BillModel model)
+        public async Task AddItemAsync(CartItemModel model)
         {
-            var Item = _context.CartItems!.SingleOrDefault(x => x.Id == IdCart);
-            Item.Status = false;
-            var History = _mapper.Map<Bill>(model);
-            await _context.AddAsync(History);
-            await _context.SaveChangesAsync();
-            return model;
+            var item = _context.CartItems!.SingleOrDefault(x => x.IdBook == model.IdBook);
+            if (item == null)
+            {
+                var NewItem = _mapper.Map<CartItem>(model);
+                await _context.CartItems!.AddAsync(NewItem);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                item.Number = item.Number + model.Number;
+                await _context.SaveChangesAsync();
+                
+            }
         }
 
+       
         public async Task RemoveItenAsync(string IdItem)
         {
             var DeleteItem = _context.CartItems!.SingleOrDefault(x => x.Id == IdItem);
@@ -82,41 +106,6 @@ namespace E_Commerce.Repository
                 _context.CartItems!.Remove(DeleteItem);
                 _context.SaveChanges();
             }
-        }
-
-        public async Task<List<BillModel>> BillHistoryAsync()
-        {
-            var ListCart = await _context.Bills!.ToListAsync();
-            return _mapper.Map<List<BillModel>>(ListCart);
-        }
-
-        public async Task<BillModel> GetCartByIdAsync(string Id)
-        {
-            var Bill = await _context.Bills!.SingleOrDefaultAsync(b => b.Id == Id);
-            return _mapper.Map<BillModel>(Bill);
-        }
-
-        public async Task EditNumberItemAsync(string IdItem, int Number)
-        {
-            var EditItem = _context.CartItems!.SingleOrDefault(x => x.Id == IdItem);
-            var Book = _context.Books!.SingleOrDefault(x => x.Id == EditItem.Id);
-
-            if (EditItem != null)
-            {
-                EditItem.Number = Number;
-                /*                EditItem.TotalItem = Book.Price * Number;
-                */
-                if (EditItem.Number == 0)
-                {
-                    await RemoveItenAsync(IdItem);
-                }
-                _context.SaveChanges();
-            }
-        }
-
-        public Task<List<BillModel>> GetItemCartByDateAsync(DateTime Time)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -32,6 +32,43 @@
     .btn-delete {
         margin-top: 10px;
     }
+    
+    .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+        z-index: 9999;
+    }
+
+    .popup p {
+        margin: 0;
+    }
+
+    .popup .close-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+    }
+
+    .item {
+        margin-bottom: 10px;
+    }
+
+    .footer-info {
+        position: fixed;
+        left: 0;
+        width: 100%;
+        background-color: #f2f2f2;
+        padding: 10px;
+    }
+    
 </style>
 
 <div class="container">
@@ -45,7 +82,7 @@
                     <div class="cart-item">
                         <div class="row">
                             <div class="col-md-1 d-flex align-items-center justify-content-cente" style="margin-left: 10px">
-                                <input type="checkbox" class="form-check-input" style=" width: 20px; height: 20px;">
+                                <input type="checkbox" value="@item.Id" class="form-check-input" style=" width: 20px; height: 20px;">
                             </div>
                             <div class="col-md-2">
                                 <img class="item-image" src="@(item.Picture)" alt="Product 1">
@@ -65,41 +102,96 @@
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                <form method="post" asp-action="DeleteItemCart" asp-route-id="@item.Id.ToString()">
-                                    <button type="submit" class="btn btn-danger">Xóa</button>
-                                </form>
+                                <button type="submit" class="showPopupBtn btn btn-danger"> Xóa </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                //popup yes no
+                <div class="popup" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3); border-radius: 5px; z-index: 1; width: 350px;">
+                    <p>
+                        Do you really want to delete this item?
+                    </p>
+                    <div class="button-container d-flex justify-content-between" style="margin-top: 10px;">
+                        <button class="btn btn-success" onclick="handleYes()">
+                            <a style="text-decoration: none; color: black;" method="get" asp-controller="Cart" asp-action="DeleteItemCart" asp-route-id="@item.Id"> Yes </a>
+                        </button>
+                        <button class="btn btn-danger" onclick="closePopup()">No</button>
+                    </div>
+                    <span class="close-btn" style="position: absolute; top: 5px; right: 5px; cursor: pointer;" onclick="closePopup()">X</span>
+                </div>
             }
         </div>
-        <div class="container mt-3">
-            <div class="row">
-                <div class="col-md-12 text-right">
-                    <button class="btn btn-primary">Mua các mục đã chọn</button>
-                </div>
+
+       <div class="footer-info">
+            <div class="container">
+                <div class="total-price">Tổng giá: <span id="total-price-value">$0</span></div>
+                <button id="buy-button">Mua hàng</button>
             </div>
         </div>
+
     }
     else
     {
-
         <i>(Hiện tại giỏ hàng của bạn đang trống)</i>
     }
 </div>
-<script>
-    // Xử lý sự kiện nút tăng/giảm số lượng
-    $(document).on('click', '.btn-plus, .btn-minus', function () {
-        const input = $(this).closest('.input-group').find('.btn-quantity');
-        const value = parseInt(input.val());
 
-        if ($(this).hasClass('btn-plus')) {
-            input.val(value + 1);
-        } else if (value > 1) {
-            input.val(value - 1);
-        }
+
+
+<script>
+    var popup = document.querySelectorAll(".popup");
+    var showPopupBtns = document.querySelectorAll(".showPopupBtn");
+
+    showPopupBtns.forEach(function (showPopupBtn, index) {
+        showPopupBtn.addEventListener("click", function () {
+            popup[index].style.display = "block";
+            document.addEventListener("click", handleOutsideClick);
+        });
     });
+
+    function handleOutsideClick(event) {
+        popup.forEach(function (popup) {
+            if (!popup.contains(event.target) && !event.target.classList.contains("showPopupBtn")) {
+                closePopup(popup);
+                document.removeEventListener("click", handleOutsideClick);
+            }
+        });
+    }
+
+    function closePopup(popup) {
+        popup.style.display = "none";
+    }
+
+
+    // Mảng lưu giá cả của từng item trong giỏ hàng (giả sử giá tiền là số nguyên)
+    const itemPrices = [100, 200, 150]; // Thay đổi giá trị này tùy theo số lượng item
+
+    // Hàm tính tổng giá của toàn bộ item trong giỏ hàng
+    function calculateTotalPrice() {
+        let totalPrice = 0;
+        for (let i = 0; i < itemPrices.length; i++) {
+            totalPrice += itemPrices[i];
+        }
+        return totalPrice;
+    }
+
+    // Cập nhật giá trị tổng giá vào thẻ span có id "total-price-value"
+    function updateTotalPrice() {
+        const totalPriceSpan = document.getElementById("total-price-value");
+        const totalPrice = calculateTotalPrice();
+        totalPriceSpan.innerText = "$" + totalPrice;
+    }
+
+    // Xử lý khi nút mua hàng được click
+    const buyButton = document.getElementById("buy-button");
+    buyButton.addEventListener("click", function () {
+        // Thêm hành động mua hàng ở đây (ví dụ: chuyển đến trang thanh toán)
+        console.log("Đã mua hàng!");
+    });
+
+    // Cập nhật tổng giá ban đầu khi trang web được tải
+    updateTotalPrice();
 </script>
 

@@ -15,7 +15,7 @@ namespace E_Commerce.Areas.Identity.Data
         public string? Picture { get; set; }
         public string? PublishingCompany { get; set; }
         public string? Category { get; set; }
-        public int? Price { get; set; }
+        public int Price { get; set; }
         public int? Status { get; set; }
         public string? Review { get; set; }
 

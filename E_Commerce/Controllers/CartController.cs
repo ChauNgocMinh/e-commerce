@@ -8,10 +8,12 @@ using System.Text;
 using E_Commerce.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
+using System;
+using AutoMapper.Execution;
 
 namespace E_Commerce.Controllers
 {
-    [Route("Controller/[action]")]
+    [Route("[Controller]/[action]")]
     [Authorize]
     public class CartController : Controller
     {
@@ -44,81 +46,70 @@ namespace E_Commerce.Controllers
             string email = HttpContext.User.Identity.Name;
             return View(await _cartRepo.ShowCartAsync(email));
         }
-        /*  [HttpPost]
-          public async Task<ActionResult> AddItem(string Id, int number)
-          {
-              try
-              {
-                  var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
-                  var book = await _bookRepo.GetBookByIdAsync(Id);
-                  CartItemModel item = new CartItemModel
-                  {
-                      Id = RandomId(),
-                      Email = email.ToString(),
-                      IdBook = Id,
-                      Number = number,
-                      TotalItem = number * book.Price,
-                      Status = true,
-                      Date = DateTime.Now,
-                  };
-                  await _cartRepo.AddItemAsync(item);
-                  return Ok();
-              }
-              catch
-              {
-                  return NotFound();
-              }
-
-          }
-          [HttpPost]*/
-        public async Task<ActionResult> Buy(string Id)
+        [HttpGet]
+        public async Task<IActionResult> AddItem(string IDBook, int number)
         {
             try
             {
-                var Item = await _cartRepo.GetCartByIdAsync(Id);
-                var email = HttpContext.User.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
-
-                var NewBill = new BillModel
+                string email = HttpContext.User.Identity.Name;
+                //var book = await _bookRepo.GetBookByIdAsync(Id);
+                CartItemModel item = new CartItemModel
                 {
                     Id = RandomId(),
-                    Email = email,
-                    IdCartItem = Id,
-                    BuyingDate = DateTime.Now,
+                    Email = email.ToString(),
+                    IdBook = IDBook,
+                    Number = number,
+                    Status = true,
                 };
-                await _cartRepo.BuyAsync(Id, NewBill);
-                return Ok();
+                await _cartRepo.AddItemAsync(item);
+                return RedirectToAction(nameof(ShowCart));
             }
             catch
             {
                 return NotFound();
             }
         }
-        [HttpGet]
-        public async Task<ActionResult> BillHistory()
+        public async Task<IActionResult> Buy(List<string> idItem,string IdBook)
         {
-            await _cartRepo.BillHistoryAsync();
-            return Ok();
-        }
-        [HttpDelete("Id")]
-        public async Task<ActionResult> DeleleItemCart(string Id)
-        {
-            await _cartRepo.RemoveItenAsync(Id);
-            var result = $"You clicked the button with ID: and it will be deleted.";
-            return View(result);
-        }
-        [HttpPost]
-        public async Task<ActionResult> EditNumberItemCart(string IdItem, int number)
-        {
-            try
+
+            string email = HttpContext.User.Identity.Name;
+            //await _cartRepo.ShowCartAsync(email);
+            var ListSelct = new List<SelctItemModel>();
+            if(idItem.Count == 0)
             {
-                await _cartRepo.EditNumberItemAsync(IdItem, number);
-                return Ok();
+                idItem.Add(RandomId());
             }
-            catch
+            if (IdBook != null || IdBook != "")
             {
-                return NotFound();
+                await AddItem(IdBook, 1);
             }
+            foreach (var item in idItem)
+            {
+                
+                var itemCart = await _cartRepo.ShowItemCartAsync(email, item);
+                SelctItemModel model = new SelctItemModel
+                {
+                    Id = RandomId(),
+                    IdItem = idItem.ToString(),
+                    Number = itemCart.Number,
+                    Name = itemCart.Name,
+                    Picture = itemCart.Picture,
+                    Price = itemCart.Price,
+                    Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
+                };
+                ListSelct.Add(model);
+            }
+            return View(ListSelct);
         }
 
+       
+        [HttpGet]
+        public async Task<IActionResult> DeleteItemCart(string id)
+        {
+
+            await _cartRepo.RemoveItenAsync(id);
+            return RedirectToAction(nameof(ShowCart));
+        }
+        
     }
 }

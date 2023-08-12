@@ -21,20 +21,37 @@
 
 <div class="container">
     <div class="row">
-        @foreach (var item in Model)
+        @foreach (var item in Model) 
         {
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <div class="product-card">
                     <div class="row justify-content-center align-items-center">
-                        <img src="@Html.DisplayFor(modelItem => item.Picture)" class="product-image card-img-top" alt="Product Image">
+                        <img src=" @item.Picture" class="product-image card-img-top" alt="Product Image">
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title"> @Html.DisplayFor(modelItem => item.Namebook)</h5>
-                        <p class="card-text"> @Html.DisplayFor(modelItem => item.Status)</p>
-                        <p class="card-text"> @Html.DisplayFor(modelItem => item.Price)</p>
+                        <h5 class="card-title">
+                            <a style="text-decoration: none" method="get" asp-controller="Books" asp-action="GetBookById" asp-route-id="@item.Id"> @item.Namebook </a>
+                        </h5>
+                        <p class="card-text"> @item.Price</p>
                         <div class="row d-flex justify-content-between" style="width: 100%">
-                            <a href="#" class="btn btn-success col-7">Buy</a>
-                            <a href="#" class="btn btn-primary float-end col-3"><i class="fas fa-cart-plus"></i></a>
+
+                            <a method="get"
+                                    asp-route-IdBook="@item.Id"
+                                   asp-action="Buy"
+                                   asp-controller="Cart"
+                                   class="btn btn-success col-7">
+                                   Buy</a>
+
+                            <a method="get"
+                                   asp-controller="Cart" 
+                                   asp-action="AddItem"
+                                   asp-route-ID="@item.Id"
+                                   asp-route-number="1"
+                                   class="btn btn-primary float-end col-3"
+                                   id="showMessageBtn">
+
+                                <i class="fas fa-cart-plus"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -42,3 +59,4 @@
         }
     </div>
 </div>
+

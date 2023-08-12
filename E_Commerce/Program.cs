@@ -19,7 +19,6 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IBookRepository, BookRepository>();
-//builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 
 // Cấu hình phân quyền
@@ -35,11 +34,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-}
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
@@ -47,6 +42,6 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Books}/{action=GetAll}/{id?}");
 
 app.Run();
