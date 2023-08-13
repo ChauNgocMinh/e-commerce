@@ -55,11 +55,10 @@ namespace E_Commerce.Repository
 
             return ListItem;
         }
-        public async Task<CartItemModel> ShowItemCartAsync(string email, string idItem)
+        public async Task<CartItemModel> ShowItemSelectAsync(string email, string idBook)
         {
-
-            var ListItem = _context.CartItems
-                .Where(CartItems => CartItems.Email == email && CartItems.Status == true)
+             var ListItem = _context.CartItems
+                .Where(CartItems => CartItems.Email == email && CartItems.IdBook == idBook)
                 .Join(_context.Books,
                     CartItems => CartItems.IdBook,
                     Books => Books.Id,
@@ -74,8 +73,7 @@ namespace E_Commerce.Repository
                         Status = CartItems.Status,
                         Price = Books.Price,
 
-                    })
-                .ToList();
+                    });
 
             return ListItem.FirstOrDefault();
         }

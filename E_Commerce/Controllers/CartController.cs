@@ -52,7 +52,6 @@ namespace E_Commerce.Controllers
             try
             {
                 string email = HttpContext.User.Identity.Name;
-                //var book = await _bookRepo.GetBookByIdAsync(Id);
                 CartItemModel item = new CartItemModel
                 {
                     Id = RandomId(),
@@ -71,33 +70,56 @@ namespace E_Commerce.Controllers
         }
         public async Task<IActionResult> Buy(List<string> idItem,string IdBook)
         {
-
+            string random = RandomId();
             string email = HttpContext.User.Identity.Name;
-            //await _cartRepo.ShowCartAsync(email);
+            int number = 0;
             var ListSelct = new List<SelctItemModel>();
             if(idItem.Count == 0)
             {
-                idItem.Add(RandomId());
-            }
-            if (IdBook != null || IdBook != "")
-            {
-                await AddItem(IdBook, 1);
+                idItem.Add(random);
+                CartItemModel itemCart = new CartItemModel
+                {
+                    Id = random,
+                    Email = email.ToString(),
+                    IdBook = IdBook,
+                    Number = 1,
+                    Status = true,
+                };
+                await _cartRepo.AddItemAsync(itemCart);
+                number = 1;
             }
             foreach (var item in idItem)
             {
-                
-                var itemCart = await _cartRepo.ShowItemCartAsync(email, item);
-                SelctItemModel model = new SelctItemModel
+                if(number != 0)
                 {
-                    Id = RandomId(),
-                    IdItem = idItem.ToString(),
-                    Number = itemCart.Number,
-                    Name = itemCart.Name,
-                    Picture = itemCart.Picture,
-                    Price = itemCart.Price,
-                    Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
-                };
-                ListSelct.Add(model);
+                    var itemCart = await _cartRepo.ShowItemSelectAsync(email, IdBook);
+                    SelctItemModel model = new SelctItemModel
+                    {
+                        //Id = RandomId(),
+                        IdItem = idItem.ToString(),
+                        Number = number,
+                        Name = itemCart.Name,
+                        Picture = itemCart.Picture,
+                        Price = itemCart.Price,
+                        Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
+                    };
+                    ListSelct.Add(model);
+                }
+                else
+                {
+                    var itemCart = await _cartRepo.ShowItemSelectAsync(email, item);
+                    SelctItemModel model = new SelctItemModel
+                    {
+                        //Id = RandomId(),
+                        IdItem = itemCart.Id,
+                        Number = itemCart.Number,
+                        Name = itemCart.Name,
+                        Picture = itemCart.Picture,
+                        Price = itemCart.Price,
+                        Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
+                    };
+                    ListSelct.Add(model);
+                }
             }
             return View(ListSelct);
         }

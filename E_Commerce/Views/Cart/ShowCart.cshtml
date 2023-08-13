@@ -1,5 +1,8 @@
 ﻿@model List<E_Commerce.Models.CartItemModel>
-
+@{
+    bool isCheckboxSelected = false;
+    List<string> IdItem = new List<string>();
+}
 <style>
     .cart-item {
         border: 1px solid #ccc;
@@ -82,7 +85,10 @@
                     <div class="cart-item">
                         <div class="row">
                             <div class="col-md-1 d-flex align-items-center justify-content-cente" style="margin-left: 10px">
-                                <input type="checkbox" value="@item.Id" class="form-check-input" style=" width: 20px; height: 20px;">
+                                <input checked="@(isCheckboxSelected)" type="checkbox" value="@item.Id" class="form-check-input" style=" width: 20px; height: 20px;" />
+                                @if (isCheckboxSelected == true){
+                                    IdItem.Add(@item.Id.ToString());
+                                }
                             </div>
                             <div class="col-md-2">
                                 <img class="item-image" src="@(item.Picture)" alt="Product 1">
@@ -124,10 +130,16 @@
             }
         </div>
 
-       <div class="footer-info">
+       <div class="">
             <div class="container">
-                <div class="total-price">Tổng giá: <span id="total-price-value">$0</span></div>
-                <button id="buy-button">Mua hàng</button>
+
+                <button>
+                    <a style="text-decoration: none; color: black;" 
+                        method="get" 
+                        asp-controller="Cart" 
+                        asp-action="Buy"
+                       asp-route-idItem="@IdItem"> Yes </a>
+                </button>
             </div>
         </div>
 

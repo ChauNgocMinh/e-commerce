@@ -19,7 +19,22 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.15" />
+    <PackageReference Include="PayPal" Version="1.9.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.1" />
   </ItemGroup>
+	
+	<configSections>
+		<section name="paypal" type="PayPal.SDKConfigHandler, PayPal" />
+	</configSections>
+	<!-- PayPal SDK settings -->
+	<paypal>
+		<settings>
+			<add name="mode" value="sandbox" />
+			<add name="connectionTimeout" value="360000" />
+			<add name="requestRetries" value="1" />
+			<add name="clientId" value="AXFqhPN-rfDXaC7v5GmNv6o6keyp1JP_jPp2pPtO7MLZ2iUgthLZtQmQj2Z3DgrgCLD9JgnMmgSk1Jmq" />
+			<add name="clientSecret" value="ENe3QvIQc8LvlmzvlQ6nBimNQ6grBkW_ncDIpIJZuOukjmcmES5HSeRbXfAYV_teE00bejQgmwJ0L_Ai" />
+		</settings>
+	</paypal>
 
 </Project>

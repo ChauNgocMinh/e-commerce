@@ -44,7 +44,21 @@ namespace E_Commerce.Controllers
                 return BadRequest();
             }
         }
-
+        [HttpGet]
+        public async Task<IActionResult> GetBookById(string id)
+        {
+            {
+                if (id != null)
+                {
+                    return View(await _BookRepo.GetBookByIdAsync(id));
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+        }
+       
 
     }
 }
