@@ -1,7 +1,12 @@
 ﻿@model List<E_Commerce.Models.CartItemModel>
 @{
-    bool isCheckboxSelected = false;
     List<string> IdItem = new List<string>();
+    List<string> IdBook = new List<string>();
+    List<string> Number = new List<string>();
+    List<string> IdAndNumber = new List<string>();
+
+    int sum = 0;
+    int number = 0;
 }
 <style>
     .cart-item {
@@ -11,7 +16,7 @@
     }
 
     .item-image {
-        width: auto;
+        width: 100px;
         height: 130px;
     }
 
@@ -55,9 +60,11 @@
 
     .popup .close-btn {
         position: absolute;
-        top: 5px;
-        right: 5px;
+        top: 0px;
+        right: 0px;
         cursor: pointer;
+        height: 20px;
+        width: 20px;
     }
 
     .item {
@@ -81,28 +88,27 @@
         <div class="row">
             @foreach (var item in Model)
             {
+                sum = sum + (int.Parse(item.Price.ToString()) * item.Number);
+                number += item.Number;
+                IdItem.Add(item.Id.ToString());
+                IdBook.Add(item.IdBook.ToString());
+                IdAndNumber.Add(item.Id.ToString() + "." + item.Number.ToString());
                 <div class="col-md-12">
                     <div class="cart-item">
                         <div class="row">
-                            <div class="col-md-1 d-flex align-items-center justify-content-cente" style="margin-left: 10px">
-                                <input checked="@(isCheckboxSelected)" type="checkbox" value="@item.Id" class="form-check-input" style=" width: 20px; height: 20px;" />
-                                @if (isCheckboxSelected == true){
-                                    IdItem.Add(@item.Id.ToString());
-                                }
-                            </div>
                             <div class="col-md-2">
-                                <img class="item-image" src="@(item.Picture)" alt="Product 1">
+                                <img class="item-image" src="@item.Picture" alt="Product 1">
                             </div>
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <p class="item-name">@(item.Name)</p>
-                                        <p class="item-price .item-quantity">Giá: @item.Price VNĐ </p>
+                                        <p class="item-name">@item.Name</p>
+                                        <p class="item-price .item-quantity">Giá: @item.Price.ToString("N0") VNĐ </p>
                                     </div>
                                     <div class="col-md-9">
                                         <div class="input-group">
                                             <p class=" item-name .item-quantity mt-3 ">Số lượng: </p>
-                                            <input type="number" class=" form-control btn-quantity" style="margin-left:10px" value=@item.Number>
+                                            <input type="number" class=" form-control btn-quantity" style="margin-left:10px" value=@item.Number.ToString()>
                                         </div>
                                     </div>
                                 </div>
@@ -113,36 +119,57 @@
                         </div>
                     </div>
                 </div>
-
                 //popup yes no
                 <div class="popup" style="display: none; position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3); border-radius: 5px; z-index: 1; width: 350px;">
                     <p>
-                        Do you really want to delete this item?
+                        Bạn thực sự muốn xóa sản phẩm này?
                     </p>
                     <div class="button-container d-flex justify-content-between" style="margin-top: 10px;">
                         <button class="btn btn-success" onclick="handleYes()">
-                            <a style="text-decoration: none; color: black;" method="get" asp-controller="Cart" asp-action="DeleteItemCart" asp-route-id="@item.Id"> Yes </a>
+                            <a style="text-decoration: none; color: black;" method="get" asp-controller="Cart" asp-action="DeleteItemCart" asp-route-id="@item.Id"> Có </a>
                         </button>
-                        <button class="btn btn-danger" onclick="closePopup()">No</button>
+                        <button class="btn btn-danger" onclick="closePopup(this)">Không</button>
                     </div>
-                    <span class="close-btn" style="position: absolute; top: 5px; right: 5px; cursor: pointer;" onclick="closePopup()">X</span>
+                    <span class="close-btn" style="position: absolute; top: 5px; right: 5px; cursor: pointer;" onclick="closePopup(this)">X</span>
                 </div>
             }
-        </div>
 
-       <div class="">
-            <div class="container">
+            <div class="col-md-12">
+                <div style="background: #f2f2f2; padding: 10px; margin-bottom: 10px; border-radius: 10px;">
+                    <div class="d-flex justify-content-between">
+                        <div style="margin-left: 25px;">
+                            <p style="margin: 0;">Số lượng sách: @number</p>
+                            <p style="margin: 0;">Phí giao hàng: 0 VNĐ</p>
+                            <p style="margin: 0;">Tổng tiền: @sum.ToString("N0") VNĐ</p>
+                        </div>
+                        <div style="margin-right: 25px;">
+                            <div>
+                                <a asp-route-id="" style="height: 40px; width: 200px" class="btn btn-success mb-2"
+                                    method="get"
+                                    asp-controller="Cart"
+                                    asp-action="ChangeNumber"
+                                    asp-route-idAndNumber="@string.Join(",", IdAndNumber)"
+                                   
+                                    id="showMessageBtn">Cập nhật giỏ hàng</a>
+                            </div>
+                            <div>
+                                <a method="get" style="height: 60px; width: 200px" class="btn btn-primary d-flex flex-column align-items-center justify-content-center"
+                                    method="get"
+                                    asp-controller="Cart"
+                                    asp-action="InfoOrder"
+                                    asp-route-idItem="@string.Join(",", IdItem)"
+                                    asp-route-IdBook="@string.Join(",", IdBook)"
+                                    id="showMessageBtn">
+                                    <p class="mb-0">Mua</p>
+                                </a>
+                            </div>
+                        </div>
 
-                <button>
-                    <a style="text-decoration: none; color: black;" 
-                        method="get" 
-                        asp-controller="Cart" 
-                        asp-action="Buy"
-                       asp-route-idItem="@IdItem"> Yes </a>
-                </button>
+                    </div>
+                </div>
             </div>
-        </div>
 
+        </div>
     }
     else
     {
@@ -155,7 +182,7 @@
 <script>
     var popup = document.querySelectorAll(".popup");
     var showPopupBtns = document.querySelectorAll(".showPopupBtn");
-
+        
     showPopupBtns.forEach(function (showPopupBtn, index) {
         showPopupBtn.addEventListener("click", function () {
             popup[index].style.display = "block";
@@ -172,38 +199,9 @@
         });
     }
 
-    function closePopup(popup) {
+    function closePopup(button) {
+        var popup = button.closest(".popup");
         popup.style.display = "none";
     }
-
-
-    // Mảng lưu giá cả của từng item trong giỏ hàng (giả sử giá tiền là số nguyên)
-    const itemPrices = [100, 200, 150]; // Thay đổi giá trị này tùy theo số lượng item
-
-    // Hàm tính tổng giá của toàn bộ item trong giỏ hàng
-    function calculateTotalPrice() {
-        let totalPrice = 0;
-        for (let i = 0; i < itemPrices.length; i++) {
-            totalPrice += itemPrices[i];
-        }
-        return totalPrice;
-    }
-
-    // Cập nhật giá trị tổng giá vào thẻ span có id "total-price-value"
-    function updateTotalPrice() {
-        const totalPriceSpan = document.getElementById("total-price-value");
-        const totalPrice = calculateTotalPrice();
-        totalPriceSpan.innerText = "$" + totalPrice;
-    }
-
-    // Xử lý khi nút mua hàng được click
-    const buyButton = document.getElementById("buy-button");
-    buyButton.addEventListener("click", function () {
-        // Thêm hành động mua hàng ở đây (ví dụ: chuyển đến trang thanh toán)
-        console.log("Đã mua hàng!");
-    });
-
-    // Cập nhật tổng giá ban đầu khi trang web được tải
-    updateTotalPrice();
 </script>
 

@@ -1,28 +1,85 @@
 ﻿@model List<E_Commerce.Models.BookModel>
-
-
-
 <style>
+    .slider-container {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        overflow: hidden;
+    }
+
+    .slide {
+        position: absolute;
+        width: 100%;
+        opacity: 0;
+        transition: opacity 0.5s;
+        padding-right:23px;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 500px;
+    }
+
+    /*-----------------------*/
+    .discount-header {
+        font-size: 2rem;
+        color: #fff; /* Màu chữ trắng */
+        margin-bottom: 2rem;
+        text-transform: uppercase;
+        background-color: #0d6efd; /* Màu nền đỏ */
+        padding: 1rem;
+    }
+    /*-----------------------*/
     .product-card {
-        border: 1px solid #ccc;
         padding: 15px;
         margin-bottom: 20px;
     }
 
+    .product-card:hover {
+/*        border-radius: 2px solid #ccc;
+    */
+        border-radius: 5px;
+        box-shadow: 0 0 10px 4px #ccc;
+    }
     .product-image {
         max-width: 200px;
         height: 250px;
     }
-
 </style>
+
 
 
 <div class="container">
     <div class="row">
+        <div class="slider-container mb-5">
+            <div class="slide active">
+                <img src="https://bizweb.dktcdn.net/100/313/410/files/web-banner-slide.png?v=1637301514520" alt="Product 1">
+            </div>
+            <div class="slide">
+                <img src="https://307a0e78.vws.vegacdn.vn/view/v2/image/img.media/Tin%20tuc/800x394%20%2812%29.png" alt="Product 2">
+            </div>
+            <div class="slide">
+                <img src="https://cdn1.tuoitre.vn/zoom/600_315/2021/8/16/sgk-16290778728511231951489-crop-16290780038522020672679.jpeg" alt="Product 3">
+            </div>
+        </div>
+
+        <div style="position: absolute; text-align: center; width: 1297px; top: 590px;" class="container slide-navigation">
+            <button class="slide-nav-button" style="background-color: rgb(27,110,194);border: none; height: 7px; width: 30px;" data-slide-index="0"></button>
+            <button class="slide-nav-button" style="background-color: rgb(27,110,194);border: none; height: 7px; width: 30px;" data-slide-index="1"></button>
+            <button class="slide-nav-button" style="background-color: rgb(27,110,194);border: none; height: 7px; width: 30px;" data-slide-index="2"></button>
+        </div>
+        <h1 class="discount-header">Sách giáo khoa</h1>
         @foreach (var item in Model) 
         {
-            <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="product-card">
+            if (item.Category == "Sách giáo khoa")
+            {
+               
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
                     <div class="row justify-content-center align-items-center">
                         <img src=" @item.Picture" class="product-image card-img-top" alt="Product Image">
                     </div>
@@ -30,15 +87,15 @@
                         <h5 class="card-title">
                             <a style="text-decoration: none" method="get" asp-controller="Books" asp-action="GetBookById" asp-route-id="@item.Id"> @item.Namebook </a>
                         </h5>
-                        <p class="card-text"> @item.Price</p>
+                        <p class="card-text"> @item.Price.ToString("N0") VNĐ</p>
                         <div class="row d-flex justify-content-between" style="width: 100%">
 
                             <a method="get"
-                                    asp-route-IdBook="@item.Id"
-                                   asp-action="Buy"
+                                   asp-route-IdBook="@item.Id"
+                                   asp-action="InfoOrder"
                                    asp-controller="Cart"
                                    class="btn btn-success col-7">
-                                   Buy</a>
+                                   Mua ngay</a>
 
                             <a method="get"
                                    asp-controller="Cart" 
@@ -53,8 +110,118 @@
                         </div>
                     </div>
                 </div>
+                </div>
+            }
+        }
+        <h1 class="discount-header">Sách truyện</h1>
+        @foreach (var item in Model)
+        {
+            if (item.Category == "Sách truyện")
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
+                        <div class="row justify-content-center align-items-center">
+                            <img src=" @item.Picture" class="product-image card-img-top" alt="Product Image">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a style="text-decoration: none" method="get" asp-controller="Books" asp-action="GetBookById" asp-route-id="@item.Id"> @item.Namebook </a>
+                            </h5>
+                            <p class="card-text"> @item.Price.ToString("N0") VNĐ</p>
+                            <div class="row d-flex justify-content-between" style="width: 100%">
+
+                                <a method="get"
+                                   asp-route-IdBook="@item.Id"
+                                   asp-action="InfoOrder"
+                                   asp-controller="Cart"
+                                   class="btn btn-success col-7">
+                                   Mua ngay</a>
+
+                                <a method="get"
+                                   asp-controller="Cart"
+                                   asp-action="AddItem"
+                                   asp-route-IDBook="@item.Id"
+                                   asp-route-number="1"
+                                   class="btn btn-primary float-end col-3"
+                                   id="showMessageBtn">
+
+                                   <i class="fas fa-cart-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        <h1 class="discount-header">Bán chạy</h1>
+        @foreach (var item in Model)
+        {
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="product-card">
+                    <div class="row justify-content-center align-items-center">
+                        <img src=" @item.Picture" class="product-image card-img-top" alt="Product Image">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a style="text-decoration: none" method="get" asp-controller="Books" asp-action="GetBookById" asp-route-id="@item.Id"> @item.Namebook </a>
+                        </h5>
+                        <p class="card-text"> @item.Price.ToString("N0") VNĐ</p>
+                        <div class="row d-flex justify-content-between" style="width: 100%">
+                            <a method="get"
+                                asp-route-IdBook="@item.Id"
+                                asp-action="InfoOrder"
+                                asp-controller="Cart"
+                                class="btn btn-success col-7">
+                                    Mua ngay</a>
+
+                            <a method="get"
+                                asp-controller="Cart"
+                                asp-action="AddItem"
+                                asp-route-IDBook="@item.Id"
+                                asp-route-number="1"
+                                class="btn btn-primary float-end col-3"
+                                id="showMessageBtn">
+                                    <i class="fas fa-cart-plus"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
     </div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var slides = document.querySelectorAll(".slide");
+        var slideIndex = 0;
+        var slideNavButtons = document.querySelectorAll(".slide-nav-button");
+
+        function showSlide(index) {
+            slides.forEach(function (slide, idx) {
+                if (idx === index) {
+                    slide.classList.add("active");
+                } else {
+                    slide.classList.remove("active");
+                }
+            });
+        }
+
+        function nextSlide() {
+            slideIndex = (slideIndex + 1) % slides.length;
+            showSlide(slideIndex);
+        }
+
+        slideNavButtons.forEach(function (button, idx) {
+            button.addEventListener("click", function () {
+                slideIndex = idx;
+                showSlide(slideIndex);
+            });
+        });
+
+        showSlide(slideIndex); // Hiển thị slide đầu tiên ban đầu
+        setInterval(nextSlide, 5000); // Đổi slide mỗi 5 giây
+    });
+
+</script>

@@ -57,30 +57,52 @@ namespace E_Commerce.Repository
         }
         public async Task<CartItemModel> ShowItemSelectAsync(string email, string idBook)
         {
-             var ListItem = _context.CartItems
-                .Where(CartItems => CartItems.Email == email && CartItems.IdBook == idBook)
-                .Join(_context.Books,
-                    CartItems => CartItems.IdBook,
-                    Books => Books.Id,
-                    (CartItems, Books) => new CartItemModel
-                    {
-                        Email = CartItems.Email,
-                        Id = CartItems.Id,
-                        IdBook = CartItems.IdBook,
-                        Name = Books.Namebook,
-                        Picture = Books.Picture,
-                        Number = CartItems.Number,
-                        Status = CartItems.Status,
-                        Price = Books.Price,
+            //ShowCartAsync(email);
+            var ListItem = _context.CartItems
+            .Where(CartItems => CartItems.Email == email && CartItems.IdBook == idBook && CartItems.Status == true)
+            .Join(_context.Books,
+                CartItems => CartItems.IdBook,
+                Books => Books.Id,
+                (CartItems, Books) => new CartItemModel
+                {
+                    Email = CartItems.Email,
+                    Id = CartItems.Id,
+                    IdBook = CartItems.IdBook,
+                    Name = Books.Namebook,
+                    Picture = Books.Picture,
+                    Number = CartItems.Number,
+                    Status = CartItems.Status,
+                    Price = Books.Price,
 
-                    });
+                });
+            return ListItem.FirstOrDefault();
+        }
+        public async Task<CartItemModel> ShowItemSelecByIDAsync(string email, string idItem)
+        {
+            //ShowCartAsync(email);
+            var ListItem = _context.CartItems
+            .Where(CartItems => CartItems.Email == email && CartItems.Id == idItem && CartItems.Status == true)
+            .Join(_context.Books,
+                CartItems => CartItems.IdBook,
+                Books => Books.Id,
+                (CartItems, Books) => new CartItemModel
+                {
+                    Email = CartItems.Email,
+                    Id = CartItems.Id,
+                    IdBook = CartItems.IdBook,
+                    Name = Books.Namebook,
+                    Picture = Books.Picture,
+                    Number = CartItems.Number,
+                    Status = CartItems.Status,
+                    Price = Books.Price,
 
+                });
             return ListItem.FirstOrDefault();
         }
 
-        public async Task AddItemAsync(CartItemModel model)
+        public async Task AddItemAsync(CartItemModel model, string email)
         {
-            var item = _context.CartItems!.SingleOrDefault(x => x.IdBook == model.IdBook);
+            var item = _context.CartItems!.SingleOrDefault(x => x.IdBook == model.IdBook && x.Status == true && x.Email == email);
             if (item == null)
             {
                 var NewItem = _mapper.Map<CartItem>(model);
@@ -91,11 +113,25 @@ namespace E_Commerce.Repository
             {
                 item.Number = item.Number + model.Number;
                 await _context.SaveChangesAsync();
-                
             }
         }
 
-       
+        public async Task<CartItem> UpdateCartItemAsync(string email, string Id, string idBill)
+        {
+            var item = _context.CartItems!.SingleOrDefault(x => x.Id == Id && x.Email == email);
+            item.Status = false;
+            item.IdBill = idBill;
+            //await _context.SaveChangesAsync();
+            return item;
+        }
+
+        public async Task ChangeNumberAsync(string email, string Id, int number)
+        {
+            var item = _context.CartItems!.SingleOrDefault(x => x.Id == Id && x.Email == email);
+            item.Number = number;
+            await _context.SaveChangesAsync();
+        }
+
         public async Task RemoveItenAsync(string IdItem)
         {
             var DeleteItem = _context.CartItems!.SingleOrDefault(x => x.Id == IdItem);

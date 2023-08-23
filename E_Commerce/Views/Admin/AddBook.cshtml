@@ -1,10 +1,10 @@
 ﻿@model E_Commerce.Models.BookModel
 
 @{
-    ViewData["Title"] = "AddBook";
+    ViewData["Title"] = "Create";
 }
 
-<h1>AddBook</h1>
+<h1>Thêm sách mới</h1>
 
 <h4>BookModel</h4>
 <hr />
@@ -43,7 +43,7 @@
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Giới thiệu</label>
+                <label class="control-label">Nhận xét</label>
                 <input asp-for="Review" class="form-control" />
                 <span asp-validation-for="Review" class="text-danger"></span>
             </div>
@@ -55,7 +55,7 @@
 </div>
 
 <div>
-    <a asp-action="ShowAllBook">Back to List</a>
+    <a asp-action="AccControl">Back to Home</a>
 </div>
 
 @section Scripts {

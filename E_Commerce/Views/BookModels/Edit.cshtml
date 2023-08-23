@@ -1,61 +1,62 @@
 ﻿@model E_Commerce.Models.BookModel
 
 @{
-    ViewData["Title"] = "AddBook";
+    ViewData["Title"] = "Edit";
 }
 
-<h1>AddBook</h1>
+<h1>Edit</h1>
 
 <h4>BookModel</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="AddBook">
+        <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label class="control-label">Mã sách</label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label class="control-label">Tên sách</label>
+                <label asp-for="Namebook" class="control-label"></label>
                 <input asp-for="Namebook" class="form-control" />
                 <span asp-validation-for="Namebook" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Link ảnh</label>
+                <label asp-for="Picture" class="control-label"></label>
                 <input asp-for="Picture" class="form-control" />
                 <span asp-validation-for="Picture" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Nhà xuất bản</label>
+                <label asp-for="PublishingCompany" class="control-label"></label>
                 <input asp-for="PublishingCompany" class="form-control" />
                 <span asp-validation-for="PublishingCompany" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Thể loại</label>
+                <label asp-for="Category" class="control-label"></label>
                 <input asp-for="Category" class="form-control" />
                 <span asp-validation-for="Category" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Giá</label>
+                <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />
                 <span asp-validation-for="Price" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label">Giới thiệu</label>
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Review" class="control-label"></label>
                 <input asp-for="Review" class="form-control" />
                 <span asp-validation-for="Review" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="ShowAllBook">Back to List</a>
+    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

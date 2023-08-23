@@ -1,0 +1,78 @@
+﻿@model List<E_Commerce.Models.InfoOrderModel>;
+
+@{
+    ViewData["Title"] = "Đơn hàng đã mua";
+}
+<style>
+    /* Thêm CSS cho hình ảnh cố định kích thước */
+    .img-fixed-size {
+        width: 60px; /* Kích thước tối đa chiều rộng */
+        height: 100px; /* Kích thước tối đa chiều cao */
+        
+    }
+
+    /* Cấu trúc cột thông tin sản phẩm */
+    .product-info {
+        display: flex;
+        flex-direction: row;
+    }
+
+    /* Nổi bật thẻ đơn hàng */
+    .order-card {
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #f7f7f7; /* Màu nền */
+    }
+
+    
+</style>
+<div class="container mt-5">
+    <h1>Đơn hàng đã mua</h1>
+    @foreach (var order in Model)
+    {
+        <div class="order-card mt-3">
+            <div class="card-header">
+                Mã đơn hàng: @order.Id
+            </div>
+            <div class="card-body">
+                <p>Ngày mua: @order.BuyingDate</p>
+                <p>Tổng tiền: @order.Total.ToString("N0") VNĐ</p>
+                @foreach (var item in order.selctItemModels)
+                {
+                    <div class="d-flex row mt-3" style="align-items: center; border-radius: 5px; background: #EEEEEE">
+
+                        <div class="col" style="">
+                            <p class="card-title"><b>@item.NameBook</b></p>
+                        </div>
+                        <div class="col">
+                            <img src="@item.Picture" class="card-img-top img-fixed-size" alt="...">
+                        </div>
+                        <div class="col">
+                            <p class="card-text">Giá: @item.Price.ToString("N0") VNĐ</p>
+                        </div>
+                        <div class="col">
+                            <p class="card-text">Số lượng: @item.Number</p>
+                        </div>
+                        <div class="col">
+                            <p class="card-text">Đơn giá: @item.Title.ToString("N0") VNĐ</p>
+                        </div>
+                    </div>
+                }
+                @if(order.Status == false){
+                    <button type="button" class="btn btn-success btn-sm mt-2">
+                        <a asp-action="ChangeStatusBill"
+                            asp-controller="Bill"   
+                            asp-route-id="@order.Id"
+                            style="text-decoration: none; color: white">
+                            Đã nhận hàng
+                        </a>
+                    </button>
+                }
+                else{
+                    <button type="button" class="btn btn-success btn-sm mt-2" disabled="disabled">Đã nhận hàng</button>
+                }
+            </div>
+        </div>
+    }
+</div>

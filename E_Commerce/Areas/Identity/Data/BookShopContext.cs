@@ -46,6 +46,7 @@ public partial class BookShopContext : IdentityDbContext<ApplicationUser>
 
             entity.Property(e => e.Picture).HasColumnName("PICTURE");
 
+            entity.Property(e => e.Price).HasColumnName("SALES");
             entity.Property(e => e.Price).HasColumnName("PRICE");
 
             entity.Property(e => e.PublishingCompany)
@@ -60,7 +61,7 @@ public partial class BookShopContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<Bill>(entity =>
         {
             entity.HasKey(e => new { e.Id, e.Email })
-                    .HasName("PK_CART_BUY");
+                .HasName("PK_CART_BUY");
 
             entity.ToTable("BILL");
 
@@ -80,18 +81,31 @@ public partial class BookShopContext : IdentityDbContext<ApplicationUser>
                 .HasColumnType("datetime")
                 .HasColumnName("BUYING_DATE");
 
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("NAME");
+
+            entity.Property(e => e.Note).HasColumnName("NOTE");
+
             entity.Property(e => e.Pay).HasColumnName("PAY");
+
+            entity.Property(e => e.PaymentMethods)
+                .HasMaxLength(20)
+                .HasColumnName("PAYMENT_METHODS");
+
+            entity.Property(e => e.Phone)
+                .HasMaxLength(10)
+                .HasColumnName("PHONE");
 
             entity.Property(e => e.Status).HasColumnName("STATUS");
 
             entity.Property(e => e.Total).HasColumnName("TOTAL");
-
         });
 
         modelBuilder.Entity<CartItem>(entity =>
         {
             entity.HasKey(e => new { e.Id, e.Email })
-                    .HasName("PK_CART_ITEM_1");
+                .HasName("PK_CART_ITEM_1");
 
             entity.ToTable("CART_ITEM");
 
@@ -145,5 +159,6 @@ public partial class BookShopContext : IdentityDbContext<ApplicationUser>
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     public DbSet<BookModel>? BookModel { get; set; }
     public DbSet<CartItemModel>? CartItemModel { get; set; }
+    public DbSet<BillModel>? BillModel { get; set; }
 
 }

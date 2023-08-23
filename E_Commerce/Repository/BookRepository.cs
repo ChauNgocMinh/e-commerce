@@ -40,7 +40,12 @@ namespace E_Commerce.Repository
             //return ListBook;
             return _mapper.Map<List<BookModel>>(ListBook);
         }
-
+        public async Task ChageNumberSaleAsync(string id, int number)
+        {
+            var Book = _context.Books!.SingleOrDefault(x => x.Id == id);
+            Book.Sales += number;
+            //await _context.SaveChangesAsync();
+        }
         public async Task<BookModel> GetBookByIdAsync(string id)
         {
             var Book = await _context.Books!.FindAsync(id);

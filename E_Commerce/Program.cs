@@ -13,14 +13,23 @@ var connectionString = builder.Configuration.GetConnectionString("BookShopContex
 builder.Services.AddDbContext<BookShopContext>(options =>
     options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(/*options => options.SignIn.RequireConfirmedAccount = true*/)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<BookShopContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddDistributedMemoryCache(); // Chọn cách lưu trữ phiên (ở đây dùng bộ nhớ)
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian tồn tại của phiên
+});
+
+builder.Services.AddAutoMapper(typeof(Program));    
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICartRepository, CartRepository>();
-
+builder.Services.AddScoped<IBillRepository, BillRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddHttpContextAccessor();
 // Cấu hình phân quyền
 builder.Services.AddAuthorization(options =>
 {
@@ -34,7 +43,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-
+app.UseSession();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();

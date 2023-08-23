@@ -13,6 +13,7 @@ namespace E_Commerce.Repository
         public Task<string> AddBookAsync(BookModel model);
         public Task UpDateBookAsync(string id, BookModel model);
         public Task DeleteBookAsync(string id);
+        public Task ChageNumberSaleAsync(string id, int number);
 
     }
 }

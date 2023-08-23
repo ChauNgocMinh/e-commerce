@@ -24,7 +24,7 @@ namespace E_Commerce.Controllers
         {
             return View(await _BookRepo.GetAllBookAsync());
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddBook()
         {
             return View();

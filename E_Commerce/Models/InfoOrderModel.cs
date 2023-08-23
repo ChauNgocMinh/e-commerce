@@ -1,6 +1,6 @@
 ﻿namespace E_Commerce.Models
 {
-    public class BillModel
+    public class InfoOrderModel
     {
         public string Id { get; set; } = null!;
         public string? Name { get; set; }
@@ -13,5 +13,6 @@
         public string? Note { get; set; }
         public string PaymentMethods { get; set; } = null!;
         public string Phone { get; set; } = null!;
+        public List<SelctItemModel> selctItemModels { get; set; }
     }
 }

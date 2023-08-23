@@ -3,10 +3,6 @@
 	int x =1;
 }
 <style>
-	.container {
-		padding: 20px;
-	}
-
 	.product-details {
 		display: flex;
 		align-items: center;
@@ -45,53 +41,65 @@
 		justify-content: center;
 		margin-top: 20px;
 	}
-
-	.buttons button {
-		margin: 5px;
-		padding: 10px 20px;
-		font-size: 16px;
-	}
 </style>
 
-<div class="container">
+<div class="container mt-3">
 	<div class="row">
 		<div class="container">
 			<div class="product-details">
 				<div class="product-image">	
 					<img src="@Model.Picture" alt="@Model.Namebook">
+					<div class="d-flex mt-5">
+						<div class="col">Số lượng bán @Model.Sales sản phẩm</div>
+						<div class="col d-flex" style="align-items: center;">
+							<div>Chia sẻ</div>
+							@{
+								string link = "http://www.facebook.com/sharer/sharer.php?s=100&p[url]=https://3f63-115-74-115-252.ngrok-free.app/Books/GetBookById/" + Model.Id + "&p[images]=" + Model.Picture + "&p[title]=" + Model.Namebook + "&p[summary]=";
+							}
+							<a href="@link"><i style="color: #010d85; margin-left: 5px" class="fab fa-facebook"></i></a>
+							<a href=""><i style="color: blue; margin-left: 5px" class="fab fa-facebook-messenger"></i></a>
+							<a href=""><i style="color:  #e80103; margin-left: 5px" class="fab fa-instagram"></i></a>
+							<a href=""><i style="color: #49bcd7; margin-left: 5px" class="fab fa-twitter"></i></a>
+						</div>
+						
+					</div>
 				</div>
-				<div class="col-md-6 product-info">
-					<h3>@Model.Namebook</h3>
-					<p>Nhà xuất bản: @Model.PublishingCompany</p>
-					<p>Thể loại: @Model.Category</p>
-					<p>(0 đánh giá) <a> Click để đánh giá</a></p>
-					<p>Giá: @Model.Price VNĐ</p>
-					<p>Vận chuyển: Giảm 30% phí vận chuyển bởi Nhất Tín Express (NTX)</p>
-					<p>Tình trạng: <i>Còn hàng</i></p>
+				<div class="col-md-6 product-info" style="height: 400px;">
+					<p style="font-size: 28px;">@Model.Namebook</p>
+					<a style="text-decoration: none;" href=""><p>Nhà xuất bản: @Model.PublishingCompany</p></a>
+					<p style="color: #ff3201; font-size: 30px; margin-bottom: -8px;margin-top: 25px;">Giá: @Model.Price.ToString("N0") VNĐ</p>
+					<p style=" margin-bottom: 30px;"><i>(Miễn phí vận chuyện với đơn hàn trên 1.000!!!)</i></p>
+					@if(Model.Status == 0){
+						<p>Tình trạng: <i>Hết hàng</i></p>
+					}
+					else{
+						<p>Tình trạng: <i>Còn hàng</i></p>
+					}
 					<div class="quantity-input">
 						<label for="quantity">Số lượng:</label>
 						<input id="myInput" type="number" min="1" onchange="updateValue()" value="@x" class="form-control" />
 					</div>
 
 
-					<div class="buttons">
-						<a asp-route-id="@Model.Id" class="btn btn-success col-6" 
+					<div class="buttons" style="justify-content: space-between; align-items:center">
+						<a asp-route-id="@Model.Id" class="btn btn-success col-5" style="height: 40px;"
 							method="get"
 							asp-controller="Cart" 
-							asp-action="Buy"
+							asp-action="InfoOrder"
 							asp-route-IDBook="@Model.Id"
 							asp-route-number="@x"
-							id="showMessageBtn">Buy</a>
+							id="showMessageBtn">
+							Mua ngay
+						</a>
 
-						<a method="get"
+						<a method="get" class="btn btn-primary float-right col-5" style="height: 40px;"
 							asp-controller="Cart" 
 							asp-action="AddItem"
 							asp-route-IDBook="@Model.Id"
 							asp-route-number="@x"
-							class="btn btn-primary float-right col-3"
-							id="showMessageBtn">
-							
-							<i class="fas fa-cart-plus"></i>
+							id="showMessageBtn"> 
+								<i class="fas fa-cart-plus"></i>
+								Thêm vào giỏ hàng
 						</a>
 					</div>
 				</div>

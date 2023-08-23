@@ -1,40 +1,48 @@
-﻿using PayPal.Api;
+﻿using Microsoft.Extensions.Configuration;
+using PayPal.Api;
+using System.Collections.Generic;
+using System.IO;
 
 namespace E_Commerce.Models
 {
-    public class PaypalConfiguration
+    public static class PaypalConfiguration
     {
-        public static class PaypalConfiguration
+        public static IConfiguration Configuration { get; set; }
+        public static readonly string ClientId;
+        public static readonly string ClientSecret;
+
+        static PaypalConfiguration()
         {
-            //Variables for storing the clientID and clientSecret key  
-            public readonly static string ClientId;
-            public readonly static string ClientSecret;
-            //Constructor  
-            static PaypalConfiguration()
-            {
-                var config = GetConfig();
-                ClientId = config["clientId"];
-                ClientSecret = config["clientSecret"];
-            }
-            // getting properties from the web.config  
-            public static Dictionary<string, string> GetConfig()
-            {
-                return PayPal.Api.ConfigManager.Instance.GetProperties();
-            }
-            private static string GetAccessToken()
-            {
-                // getting accesstocken from paypal  
-                string accessToken = new OAuthTokenCredential(ClientId, ClientSecret, GetConfig()).GetAccessToken();
-                return accessToken;
-            }
-            public static APIContext GetAPIContext()
-            {
-                // return apicontext object by invoking it with the accesstoken  
-                APIContext apiContext = new APIContext(GetAccessToken());
-                apiContext.Config = GetConfig();
-                return apiContext;
-            }
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            Configuration = builder.Build();
+
+            var paypalSettings = Configuration.GetSection("PayPal:Settings");
+            ClientId = paypalSettings["ClientId"];
+            ClientSecret = paypalSettings["ClientSecret"];
         }
 
+        private static string GetAccessToken()
+        {
+            string accessToken = new OAuthTokenCredential(ClientId, ClientSecret).GetAccessToken();
+            return accessToken;
+        }
+
+        public static APIContext GetAPIContext()
+        {
+            APIContext apiContext = new APIContext(GetAccessToken());
+
+            // Convert IConfigurationSection to Dictionary<string, string>
+            Dictionary<string, string> configDictionary = new Dictionary<string, string>();
+            foreach (var item in Configuration.GetSection("PayPal:Settings").GetChildren())
+            {
+                configDictionary[item.Key] = item.Value;
+            }
+            apiContext.Config = configDictionary;
+
+            return apiContext;
+        }
     }
 }

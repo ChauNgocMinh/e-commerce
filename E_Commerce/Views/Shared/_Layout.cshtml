@@ -8,35 +8,71 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/E_Commerce.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script id="mcjs">!function (c, h, i, m, p) { m = c.createElement(h), p = c.getElementsByTagName(h)[0], m.async = 1, m.src = i, p.parentNode.insertBefore(m, p) }(document, "script", "https://chimpstatic.com/mcjs-connected/js/users/94d4ec11206b5dc82bd4fcb74/e1e0661b0629ed3d1222159e6.js");</script>
 
+
+    <script>
+        var chatbox = document.getElementById('fb-customer-chat');
+        chatbox.setAttribute("page_id", "119220827935668");
+        chatbox.setAttribute("attribution", "biz_inbox");
+    </script>
+
+   
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Books" asp-action="GetAll">E_Commerce</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="ShowCart">Cart</a>
-                        </li>
-                    </ul>
-                </div>
-                <partial name="_LoginPartial"></partial>
-            </div>
-        </nav>
-    </header>
+    <!-- Messenger Plugin chat Code -->
+    <div id="fb-root"></div>
 
-    <div class="container">
+    <!-- Your Plugin chat code -->
+    <div id="fb-customer-chat" class="fb-customerchat">
+
+    </div>
+    <div style="height: 70px" class="container d-flex justify-content-between align-items-center">
+        <div class="input-group search-container w-25" style="margin-left: 30px">
+            <input type="text" class="form-control search-input" placeholder="Tìm kiếm..." style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+            <button class="btn btn-primary search-button" type="button" style="background: #0d6efd ; border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div style="" class="ml-auto">
+            <partial name="_LoginPartial"></partial>
+        </div>
+    </div>
+    <div class="header">
+        <div class="container" >
+            @if (this.User.IsInRole("Admin"))
+            {
+                <button class="header-button">
+                    <a style="font-family: Arial" class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="GetAll">TRANG CHỦ</a>
+                </button>
+            }
+            else{
+                <button class="header-button">
+                    <a style="font-family: Arial" class="nav-link text-dark" asp-area="" asp-controller="Books" asp-action="GetAll">TRANG CHỦ</a>
+                </button>
+                <button class="header-button" id="scrollButton1">
+                    <div style="font-family: Arial" class="nav-link text-dark">SÁCH GIÁO KHOA</div>
+                </button>
+                <button class="header-button" id="scrollButton2">
+                    <div style="font-family: Arial" class="nav-link text-dark">SÁCH TRUYỆN</div>
+                </button>
+                <button class="header-button" id="scrollButton3">
+                    <div style="font-family: Arial" class="nav-link text-dark">BÁN CHẠY</div>
+                </button>
+            }
+          
+            
+        </div>
+    </div>
+
+   
+    <div class="container ">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
+    <button id="scrollToTopBtn" class="hidden"><i class="fas fa-arrow-up"></i></button>
     <footer class="border-top footer text-muted" style="margin-top: 100px">
         <div class="container">
             Built by Chau Ngoc Minh - chaungocminh202@gmail.com
@@ -45,6 +81,75 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+  
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+<script>
+    const scrollButton1 = document.getElementById('scrollButton1');
+    function scrollToBottom1() {
+        window.scrollTo({
+            top: 680, 
+            behavior: 'smooth' 
+        });
+    }
+    scrollButton1.addEventListener('click', scrollToBottom1);
+
+    const scrollButton2 = document.getElementById('scrollButton2');
+    function scrollToBottom2() {
+        window.scrollTo({
+            top: 1660,
+            behavior: 'smooth'
+        });
+    }
+    scrollButton2.addEventListener('click', scrollToBottom2);
+
+    const scrollButton3 = document.getElementById('scrollButton3');
+    function scrollToBottom3() {
+        window.scrollTo({
+            top: 2650,
+            behavior: 'smooth'
+        });
+    }
+    scrollButton3.addEventListener('click', scrollToBottom3);
+
+    const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+
+    // Khi người dùng cuộn trang, kiểm tra vị trí để hiển thị/ẩn nút
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > 300) { // Khi cuộn xuống một khoảng cụ thể
+            scrollToTopBtn.classList.add("show");
+        } else {
+            scrollToTopBtn.classList.remove("show");
+        }
+    });
+
+    // Xử lý sự kiện khi nút được nhấp vào
+    scrollToTopBtn.addEventListener("click", () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    });
+
+    var chatbox = document.getElementById('fb-customer-chat');
+    chatbox.setAttribute("page_id", "119220827935668");
+    chatbox.setAttribute("attribution", "biz_inbox");
+    window.fbAsyncInit = function () {
+        FB.init({
+            xfbml: true,
+            version: 'v17.0'
+        });
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/vi_VN/sdk/xfbml.customerchat.js';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
+

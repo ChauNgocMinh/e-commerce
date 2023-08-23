@@ -10,11 +10,12 @@ using Microsoft.AspNetCore.Identity;
 using System.Data;
 using System;
 using AutoMapper.Execution;
+using PayPal.Api;
 
 namespace E_Commerce.Controllers
 {
     [Route("[Controller]/[action]")]
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class CartController : Controller
     {
         public readonly ICartRepository _cartRepo;
@@ -60,7 +61,7 @@ namespace E_Commerce.Controllers
                     Number = number,
                     Status = true,
                 };
-                await _cartRepo.AddItemAsync(item);
+                await _cartRepo.AddItemAsync(item, email);
                 return RedirectToAction(nameof(ShowCart));
             }
             catch
@@ -68,63 +69,158 @@ namespace E_Commerce.Controllers
                 return NotFound();
             }
         }
-        public async Task<IActionResult> Buy(List<string> idItem,string IdBook)
+        [HttpGet]
+        public async Task<IActionResult> InfoOrder(string idItem, string IdBook, int number)
         {
-            string random = RandomId();
-            string email = HttpContext.User.Identity.Name;
-            int number = 0;
-            var ListSelct = new List<SelctItemModel>();
-            if(idItem.Count == 0)
+            try
             {
-                idItem.Add(random);
-                CartItemModel itemCart = new CartItemModel
+                List<string> idItemlist = new List<string>();
+                List<string> idItemBooklist = new List<string>();
+                string email = HttpContext.User.Identity.Name;
+                //int number = 0;
+                var ListSelct = new List<SelctItemModel>();
+                if (idItem == null)
                 {
-                    Id = random,
-                    Email = email.ToString(),
-                    IdBook = IdBook,
-                    Number = 1,
-                    Status = true,
-                };
-                await _cartRepo.AddItemAsync(itemCart);
-                number = 1;
-            }
-            foreach (var item in idItem)
-            {
-                if(number != 0)
-                {
-                    var itemCart = await _cartRepo.ShowItemSelectAsync(email, IdBook);
-                    SelctItemModel model = new SelctItemModel
+                    string random = RandomId();
+                    idItemlist.Add(random);
+                    CartItemModel itemCart = new CartItemModel
                     {
-                        //Id = RandomId(),
-                        IdItem = idItem.ToString(),
+                        Id = random,
+                        Email = email.ToString(),
+                        IdBook = IdBook,
                         Number = number,
-                        Name = itemCart.Name,
-                        Picture = itemCart.Picture,
-                        Price = itemCart.Price,
-                        Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
+                        Status = true,
+                        Price = 0,
                     };
-                    ListSelct.Add(model);
+                    await _cartRepo.AddItemAsync(itemCart, email);
                 }
                 else
                 {
-                    var itemCart = await _cartRepo.ShowItemSelectAsync(email, item);
-                    SelctItemModel model = new SelctItemModel
-                    {
-                        //Id = RandomId(),
-                        IdItem = itemCart.Id,
-                        Number = itemCart.Number,
-                        Name = itemCart.Name,
-                        Picture = itemCart.Picture,
-                        Price = itemCart.Price,
-                        Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
-                    };
-                    ListSelct.Add(model);
+                    idItemlist = new List<string>(idItem.Split(','));
+                    idItemBooklist = new List<string>(IdBook.Split(','));
                 }
+                foreach (var item in idItemlist)
+                {
+                    //var model = _cartRepo.
+                    if (idItem == null)
+                    {
+                        var itemCart = await _cartRepo.ShowItemSelectAsync(email, IdBook);
+                        SelctItemModel model = new SelctItemModel
+                        {
+                            Id = IdBook,
+                            //Id = RandomId(),
+                            IdItem = itemCart.Id,
+                            Number = number,
+                            NameBook = itemCart.Name,
+                            Picture = itemCart.Picture,
+                            Price = itemCart.Price,
+                            Title = itemCart.Price,
+                        };
+                        ListSelct.Add(model);
+                    }
+                    else
+                    {
+                        var itemCart = await _cartRepo.ShowItemSelecByIDAsync(email, item);
+                        SelctItemModel model = new SelctItemModel
+                        {
+                            Id = itemCart.IdBook,
+                            //Id = RandomId(),
+                            IdItem = itemCart.Id,
+                            Number = itemCart.Number,
+                            NameBook = itemCart.Name,
+                            Picture = itemCart.Picture,
+                            Price = itemCart.Price,
+                            Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
+                        };
+                        ListSelct.Add(model);
+                    }
+                }
+                InfoOrderModel infoOrder = new InfoOrderModel()
+                {
+                    selctItemModels = ListSelct,
+                };
+                return View(infoOrder);
             }
-            return View(ListSelct);
+            catch
+            {
+                return NotFound();
+            }
         }
 
-       
+        [HttpPost]
+        public async Task<IActionResult> Buy(string idItem, string IdBook)
+        {
+            try
+            {
+                List<string> idItemlist = new List<string>();
+
+                string email = HttpContext.User.Identity.Name;
+                int number = 0;
+                var ListSelct = new List<SelctItemModel>();
+                if (idItem == null)
+                {
+                    string random = RandomId();
+                    idItemlist.Add(random);
+                    CartItemModel itemCart = new CartItemModel
+                    {
+                        Id = random,
+                        Email = email.ToString(),
+                        IdBook = IdBook,
+                        Number = 1,
+                        Status = true,
+                    };
+                    await _cartRepo.AddItemAsync(itemCart, email);
+                    number = 1;
+                }
+                else
+                {
+                    idItemlist = new List<string>(idItem.Split(','));
+                }
+                foreach (var item in idItemlist)
+                {
+                    if (number != 0)
+                    {
+                        var itemCart = await _cartRepo.ShowItemSelectAsync(email, IdBook);
+                        SelctItemModel model = new SelctItemModel
+                        {
+                            //Id = RandomId(),
+                            IdItem = itemCart.Id,
+                            Number = number,
+                            NameBook = itemCart.Name,
+                            Picture = itemCart.Picture,
+                            Price = itemCart.Price,
+                            Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
+                        };
+                        ListSelct.Add(model);
+                    }
+                    else
+                    {
+                        var itemCart = await _cartRepo.ShowItemSelecByIDAsync(email, item);
+                        SelctItemModel model = new SelctItemModel
+                        {
+                            //Id = RandomId(),
+                            IdItem = itemCart.Id,
+                            Number = itemCart.Number,
+                            NameBook = itemCart.Name,
+                            Picture = itemCart.Picture,
+                            Price = itemCart.Price,
+                            Title = itemCart.Price * double.Parse(itemCart.Number.ToString()),
+                        };
+                        ListSelct.Add(model);
+                    }
+                }
+                InfoOrderModel infoOrder = new InfoOrderModel()
+                {
+                    selctItemModels = ListSelct,
+                };
+                return View(infoOrder);
+            }
+            catch
+            {
+                return NotFound();
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> DeleteItemCart(string id)
         {
@@ -133,5 +229,34 @@ namespace E_Commerce.Controllers
             return RedirectToAction(nameof(ShowCart));
         }
         
+        public async Task<IActionResult> ChangeNumber(string idAndNumber)
+        {
+            string email = HttpContext.User.Identity.Name;
+            string[] pairs = idAndNumber.Split(',');
+
+            List<ItemModel> itemList = new List<ItemModel>();
+
+            foreach (string pair in pairs)
+            {
+                string[] parts = pair.Split('.');
+
+                if (parts.Length == 2)
+                {
+                    itemList.Add(new ItemModel { Id = parts[0], Number = parts[1] });
+                }
+            }
+
+
+            foreach (ItemModel item in itemList)
+            {
+                await _cartRepo.ChangeNumberAsync(email, item.Id, int.Parse(item.Number));
+            }
+            return RedirectToAction(nameof(ShowCart));
+        }
+    }
+    public class ItemModel
+    {
+        public string Id { get; set; }
+        public string Number { get; set; }
     }
 }
